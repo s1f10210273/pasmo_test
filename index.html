@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>NFCタグ読み取り</title>
+</head>
+<body>
+  <h1>NFCタグ読み取り</h1>
+
+  <button id="scanButton">NFCタグをスキャン</button>
+  <p id="result"></p>
+  
+  <script>
+    // NFCリーダーへのアクセス許可を要求
+    async function requestNFCPermission() {
+      try {
+        const ndef = new NDEFReader();
+        await ndef.scan();
+        return ndef;
+      } catch (error) {
+        console.error('NFCスキャンの許可を取得できませんでした:', error);
+        // エラーハンドリングを行うか、代替の手段を提供するなどの処理を追加することができます
+      }
+    }
+
+    // NFCタグの読み取りと解析
+    async function readNFCTag() {
+      try {
+        const ndef = await requestNFCPermission();
+        if (ndef) {
+          ndef.addEventListener('reading', event => {
+            const message = event.message;
+            // NDEFメッセージの解析と必要な情報の抽出を行う処理を追加することができます
+            const resultElement = document.getElementById('result');
+            resultElement.textContent = JSON.stringify(message);
+          });
+          await ndef.start();
+        }
+      } catch (error) {
+        console.error('NFCタグの読み取り中にエラーが発生しました:', error);
+      }
+    }
+
+    // ボタンのクリックイベントハンドラを設定し、NFCタグの読み取りを開始する
+    const scanButton = document.getElementById('scanButton');
+    scanButton.addEventListener('click', readNFCTag);
+  </script>
+</body>
+</html>
